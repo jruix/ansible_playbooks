@@ -1,6 +1,0 @@
--
-  hosts: all
-  sudo: yes
-  tasks:
-    - name: Install htop
-      yum: pkg=htop state=installed
