@@ -1,0 +1,9 @@
+---
+- name: Provision JTI E-Commerce platform web server
+  hosts: all
+  remote_user: jtiadmin
+  sudo: yes
+
+  roles:
+    - common
+    - provision

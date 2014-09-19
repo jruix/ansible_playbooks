@@ -1,0 +1,4 @@
+# Getting sources from the repository
+- git: repo=https://github.com/jruix/deployment_test.git
+       dest=/var/www/html/
+

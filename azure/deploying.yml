@@ -1,0 +1,9 @@
+---
+- name: Deploy JTI E-Commerce new version to web server
+  hosts: all
+  remote_user: jtiadmin
+  sudo: yes
+
+  roles:
+    - common    
+    - deploy
