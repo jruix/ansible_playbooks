@@ -1,0 +1,47 @@
+---
+- name: Download Magento Downloader
+  get_url: url=http://www.magentocommerce.com/downloads/assets/{{ mag_version }}/magento-{{ mag_version }}.tar.gz dest=/var/www/magento-{{ mag_version }}.tar.gz
+
+- name: Extract Archive
+  command: chdir=/var/www/ /bin/tar xvf magento-{{ mag_version }}.tar.gz
+
+- name: Check if domain name path exists
+  stat: path=/var/www/{{ domain_name }}/
+  register: check_path
+
+- name: If path exist remove it
+  shell: chdir=/var/www/ /bin/rm -rf {{ domain_name }}
+  when: check_path.stat.exists
+
+- name: Change Magento folder to Domain name
+  shell: chdir=/var/www/ mv magento {{ domain_name }}
+
+- name: Change ownership of Magento installation
+  file: path=/var/www/{{ domain_name }}/ owner=apache group=apache state=directory recurse=yes
+
+- name: Change ownership of magento installation 2
+  shell: chdir=/var/www/{{ domain_name }}/ find . -type f -exec chmod 644 {} \;
+
+- name: Change ownership of magento installation 3
+  shell: chdir=/var/www/{{ domain_name }}/ find . -type d -exec chmod 755 {} \;
+
+- name: Change ownership of magento installation 4
+  shell: chdir=/var/www/{{ domain_name }}/ chmod o+w var var/.htaccess app/etc
+
+- name: Change ownership of magento installation 5
+  shell: chdir=/var/www/{{ domain_name }}/ chmod 550 mage
+
+- name: Change ownership of magento installation 6
+  shell: chdir=/var/www/{{ domain_name }}/ chmod -R o+w media
+
+- name: Mage Setup
+  shell: chdir=/var/www/{{ domain_name }}/ ./mage mage-setup .
+  
+- name: Mage Stable State
+  shell: chdir=/var/www/{{ domain_name }}/ ./mage config-set preferred_state stable
+
+- name: Install Core
+  shell: chdir=/var/www/{{ domain_name }}/ ./mage install http://connect20.magentocommerce.com/community Mage_All_Latest --force
+
+- name: Unattended Magento configuration
+  shell: chdir=/var/www/{{ domain_name }}/ php -f install.php -- --license_agreement_accepted yes --locale en_UK --timezone "Europe/London" --default_currency GBP --db_host eu-cdbr-azure-west-a.cloudapp.net --db_name ppeg-test --db_user b9ff9d0a3e0b24 --db_pass 55aa7079 --db_prefix magento_ --url "http://ppge-test.cloudapp.net" --use_rewrites yes --use_secure no --secure_base_url "https://ppge-test.cloudapp.net" --use_secure_admin no --admin_lastname Owner --admin_firstname Store --admin_email "jonathan.peinado@jti.com" --admin_username admin --admin_password 7characters --encryption_key "randomencryptionkeyshouldbeplacedhere"
