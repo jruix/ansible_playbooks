@@ -1,0 +1,5 @@
+---
+- name: Enable mod rewrite
+  replace: dest=/etc/httpd/conf/httpd.conf regexp='AllowOverride None' replace='AllowOverride All'
+  notify:
+      - restart apache

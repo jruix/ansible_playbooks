@@ -6,5 +6,5 @@
 
   roles:
     - common
-    - provision
+    - webserver
     - magento

@@ -2,13 +2,5 @@
 # Which version of Magento to deploy
 mag_version: 1.9.0.1
 
-# These are the Magento database settings
-mag_db_name: magento 
-mag_db_user: xxxxxx
-mag_db_password: [[xxxxx]]
-
-# You shouldn't need to change this.
-mysql_port: 3306
-
-server_hostname: xxxxxxx
+# Magento installation destination
 domain_name: html

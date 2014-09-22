@@ -1,3 +1,6 @@
 ---
 - name: restart apache
   service: name=httpd state=restarted
+
+- name: restart server
+  command: /sbin/reboot

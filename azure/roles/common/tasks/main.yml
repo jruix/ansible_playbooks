@@ -1,2 +1,16 @@
 ---
+#TODO: Check if selinux can be enabled with ASL and configure ti for being use if possible
+- selinux: state=disabled
+  notify:
+        - restart server
+
+# CentOs 7 firwalld is breaking Azure endpoints (port 80)
+#- name: Stop service firewalld (Linux)
+#  shell: systemctl disable firewalld; systemctl stop firewalld
+- name: stop firewalld
+  service: name=firewalld state=stopped enabled=no
+
+- name: Downloading and enable the EPEL repository definitions.
+  action: command rpm -Uvh --replacepkgs http://dl.fedoraproject.org/pub/epel/beta/7/x86_64/epel-release-7-1.noarch.rpm
+  changed_when: False
 

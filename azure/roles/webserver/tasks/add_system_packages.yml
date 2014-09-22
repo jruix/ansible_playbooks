@@ -1,0 +1,36 @@
+---
+- name: Check if httpd is present
+  yum: name=httpd state=present
+
+- name: install PHP
+  yum: name=php state=present
+  notify:
+      - restart apache
+
+- name: install php-xml
+  yum: name=php-xml state=present
+  notify:
+      - restart apache
+
+- name: install php-pdo
+  yum: name=php-pdo state=present
+  notify:
+      - restart apache
+
+- name: install php-mcrypt
+  yum: name=php-mcrypt state=present
+  notify:
+      - restart apache
+
+- name: install php-gd
+  yum: name=php-mcrypt state=present
+  notify:
+      - restart apache
+
+- name: install PHP mysql module for Apache
+  yum: name=php-mysql state=present
+  notify:
+      - restart apache
+
+- name: Install git
+  yum: name=git state=present
