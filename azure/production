@@ -1,0 +1,3 @@
+[west_europe-webservers]
+ppge-test-1 ansible_ssh_host=ppge-test.cloudapp.net ansible_ssh_port=22001
+ppge-test-2 ansible_ssh_host=ppge-test.cloudapp.net ansible_ssh_port=22002
