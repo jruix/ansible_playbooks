@@ -1,1 +1,2 @@
 azure/group_vars
+azure/vagrant_ansible_inventory_default
