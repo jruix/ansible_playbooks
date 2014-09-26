@@ -2,7 +2,7 @@
 # These are the Magento database settings
 mag_db_name: ppeg-test
 mag_db_user: b9ff9d0a3e0b24
-mag_db_password: 55aa7079
+mag_db_password: [[55aa7079]]
 mag_db_host: eu-cdbr-azure-west-a.cloudapp.net
 
 # You shouldn't need to change this.

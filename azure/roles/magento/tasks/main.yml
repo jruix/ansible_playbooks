@@ -16,6 +16,25 @@
 - name: Change Magento folder to Domain name
   shell: chdir=/var/www/ mv magento {{ domain_name }}
 
+# Installing sample data (Note this is jsut valid for magento 1.9.* and above )
+- name: Creates directory
+  file: path=~/magento state=directory
+
+- name: Download Magento sample data
+  get_url: url=http://www.magentocommerce.com/downloads/assets/1.9.0.0/magento-sample-data-1.9.0.0.tar.bz2 dest=~/magento/magento-sample-data-1.9.0.0.tar.bz2
+
+- name: Extract sample data archive
+  command: chdir=~/magento /bin/tar jvxf magento-sample-data-1.9.0.0.tar.bz2
+
+- name: copy sample data to magento installation
+  shell: chdir=/var/www/{{ domain_name }} cp -R ~/magento/magento-sample-data-1.9.0.0/media/* ./media
+
+- name: copy sample data to magento installation
+  shell: chdir=/var/www/{{ domain_name }} cp -R ~/magento/magento-sample-data-1.9.0.0/skin/* ./skin
+
+- name: Adding database sample records
+  shell: chdir=~/magento/magento-sample-data-1.9.0.0/ mysql -h {{ mag_db_host }} -u {{ mag_db_user }} -p{{ mag_db_password }} {{ mag_db_name }} < ./magento_sample_data_for_1.9.0.0.sql
+
 - name: Change ownership of Magento installation
   file: path=/var/www/{{ domain_name }}/ owner=apache group=apache state=directory recurse=yes
 
@@ -44,4 +63,4 @@
   shell: chdir=/var/www/{{ domain_name }}/ ./mage install http://connect20.magentocommerce.com/community Mage_All_Latest --force
 
 - name: Unattended Magento configuration
-  shell: chdir=/var/www/{{ domain_name }}/ php -f install.php -- --license_agreement_accepted yes --locale en_UK --timezone "Europe/London" --default_currency GBP --db_host eu-cdbr-azure-west-a.cloudapp.net --db_name ppeg-test --db_user b9ff9d0a3e0b24 --db_pass 55aa7079 --db_prefix magento_ --url "http://ppge-test.cloudapp.net" --use_rewrites yes --use_secure no --secure_base_url "https://ppge-test.cloudapp.net" --use_secure_admin no --admin_lastname Owner --admin_firstname Store --admin_email "jonathan.peinado@jti.com" --admin_username admin --admin_password 7characters --encryption_key "randomencryptionkeyshouldbeplacedhere"
+  shell: chdir=/var/www/{{ domain_name }}/ php -f install.php -- --license_agreement_accepted yes --locale en_GB --timezone "Europe/London" --default_currency GBP --db_host {{ mag_db_host }} --db_name {{ mag_db_name }} --db_user {{ mag_db_user }} --db_pass {{ mag_db_password }} --url "http://ppge-test.cloudapp.net" --use_rewrites yes --use_secure no --secure_base_url "https://ppge-test.cloudapp.net" --use_secure_admin no --admin_lastname Owner --admin_firstname Store --admin_email "jonathan.peinado@jti.com" --admin_username admin --admin_password 7characters --encryption_key "randomencryptionkeyshouldbeplacedhere"

@@ -1,4 +1,7 @@
 ---
+- name: Check if mysql(mariadb) is present
+  yum: name=mariadb state=present
+
 - name: Check if httpd is present
   yum: name=httpd state=present
 
@@ -34,3 +37,6 @@
 
 - name: Install git
   yum: name=git state=present
+
+- name: Install bzip2
+  yum: name=bzip2 state=present
