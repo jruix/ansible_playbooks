@@ -1,0 +1,14 @@
+---
+# Which version of Magento to deploy
+mag_version: 1.9.0.1
+
+# These are the Magento database settings
+mag_db_name: magento 
+mag_db_user: b9ff9d0a3e0b24
+mag_db_password: [[55aa7079]]
+
+# You shouldn't need to change this.
+mysql_port: 3306
+
+server_hostname: ppge-test.cloudapp.net
+domain_name: html

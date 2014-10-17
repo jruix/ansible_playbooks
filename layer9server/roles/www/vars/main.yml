@@ -1,0 +1,5 @@
+---
+www_domain_directory: /var/dns
+www_user: www-data
+www_group: www-data
+www_virtual_domain_files_path: /etc/apache2/sites-available

@@ -1,0 +1,15 @@
+---
+- name: Check if bind9 dns server is present
+  apt: name=bind9 state=present
+
+- name: Creates bin dns zones directory
+  file: path={{ dns_zones_directory }} state=directory owner={{ bind_user }} group={{ bind_group }}
+
+- name: Creates dns administration scripts directory
+  file: path=/root/administration_scripts/dns state=directory owner={{ root }} group={{ root }} mode="u=rw,g=r,o="
+
+- name: Copy administration scripts add_dns_host.sh
+  template: src=add_dns_host.sh.j2 dest=add_dns_host.sh owner=root group=root mode="u=rwx,g=rx,o="
+
+- name: Copy administration scripts add_dns_zone.sh
+  template: src=add_dns_zone.sh.j2 dest=add_dns_zone.sh owner=root group=root mode="u=rwx,g=rx,o="

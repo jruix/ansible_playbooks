@@ -1,0 +1,235 @@
+#!/bin/bash
+#./add_apache_vhost -o vhost_owner -d domain_name [-p https|http|both] [-s subdomain] [-a alias,alias...] [-t template_file]
+
+#chequea el numero de argumentos
+
+NO_ARGS=0
+E_OPTERROR=85
+MANDATORY_COUNT=2
+SERVER_PORT=80
+PROTOCOL="http"
+FORCE_HTTPS=0
+ALIAS=""
+SUBDOMAIN=""
+SSL_DIRECTIVES=""
+TEMPLATE="../templates/_apache_vhost_template"
+DOCUMENT_ROOT=""
+SERVER_ALIAS=""
+#Get host ip address
+SERVER_IP=`eval /sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
+ALIAS=""
+
+while getopts ":o:d:s:p:a:t:f" Option
+do
+  case $Option in
+        o)
+                let "NO_ARGS++"
+                OWNER=$OPTARG
+        ;;
+        d)      let "NO_ARGS++"
+                DOMAIN=$OPTARG
+        ;;
+
+        s)      SUBDOMAIN=$OPTARG
+        ;;
+	p)     	PROTOCOL=$OPTARG
+        ;;
+	a)      ALIAS=$OPTARG
+        ;;
+	t)      TEMPLATE=$OPTARG
+        ;;
+	f)	FORCE_HTTPS=1
+	;;
+    #  Note that options must have an associated argument,
+    #+ otherwise it falls through to the default.
+        *) echo "Unimplemented option chosen.";;   # Default.
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+if [ $MANDATORY_COUNT -eq $NO_ARGS ]
+then
+
+	if [ $PROTOCOL == "https" ]
+	then
+		SERVER_PORT=443
+		SSL_DIRECTIVES="
+        SSLEngine on
+        SSLCertificateFile /etc/ssl/certs/server.crt
+        SSLCertificateKeyFile /etc/ssl/private/server.key		
+		"
+	fi
+
+	if [ $PROTOCOL == "http" ]
+        then
+                SERVER_PORT=80
+                SSL_DIRECTIVES=""
+        fi
+
+	if [ $PROTOCOL == "both" ]
+        then
+                SERVER_PORT=80
+                SSL_DIRECTIVES=""
+        fi
+	
+
+	if [ "$ALIAS" ]
+        then
+		typeset IFS=","
+		for alias in $ALIAS
+    		do
+        		SERVER_ALIAS="$SERVER_ALIAS $alias"
+    		done		
+	fi
+	
+	if [ -d "/home/vhost_owners/$OWNER" ]
+        then
+        	if [ -d "/home/vhost_owners/$OWNER/domains/$DOMAIN" ]
+                then
+			if [ "$SUBDOMAIN" != "" ]
+			then
+				if [ -d "/home/vhost_owners/$OWNER/domains/$DOMAIN/subdomains/$SUBDOMAIN" ]
+				then
+					vhost_file="/etc/apache2/sites-available/$SUBDOMAIN.$DOMAIN"
+					if [ -f $vhost_file ]
+					then
+						echo "[Warning] $vhost_file already exist"
+						read -p "Are you sure you want to overwrite it?[Yy/Nn] " -n 1
+						echo ""
+						if [[ ! $REPLY =~ ^[Yy]$ ]]
+						then
+							echo "[Info] NOTHING DONE"
+    							exit 1
+						fi
+						echo "#`date`" > $vhost_file
+					fi
+					
+					echo "[Info] Creating $vhost_file";
+					DOCUMENT_ROOT="/home/vhost_owners/$OWNER/domains/$DOMAIN/subdomains/$SUBDOMAIN/httpdocs"
+					SERVER_NAME=$SUBDOMAIN.$DOMAIN
+					LOGS_PATH="/home/vhost_owners/$OWNER/domains/$DOMAIN/subdomains/$SUBDOMAIN/logs"
+					IFS=$''
+					while read line; do 
+						eval_line=`eval echo \"$line\"`
+						echo $eval_line >> $vhost_file 
+					done < $TEMPLATE
+					if [ $PROTOCOL == "both" ]
+					then
+						if [ $FORCE_HTTPS == 1  ]
+                                                then
+                                                        while read line; do
+                                                                eval_line=`eval echo \"$line\"`
+                                                                echo $eval_line >> $vhost_file
+                                                        done < ../templates/_force_https_template
+                                                else 
+
+							SERVER_PORT=443
+	        				        SSL_DIRECTIVES="
+        SSLEngine on
+        SSLCertificateFile /etc/ssl/certs/server.crt
+        SSLCertificateKeyFile /etc/ssl/private/server.key               
+                						"
+	
+							while read line; do
+                			        	        eval_line=`eval echo \"$line\"`
+        	        	                        	echo $eval_line >> $vhost_file
+		                                        done < $TEMPLATE
+						fi
+								
+					fi
+					a2ensite $SERVER_NAME
+					apache2ctl configtest
+                                	if [ $? == 0 ]	
+                                	then
+                                        	apache2ctl -k graceful
+                                	else
+                                        	echo -e "\E[37;41m[Error] check apache config files"
+						tput sgr0
+                                	fi
+
+				else
+					echo -e "\E[37;41m[Error] subdomain $SUBDOMAIN doesn't exist use: ./add_subdomain ... to add it";
+					tput sgr0
+					exit $?
+				fi
+			else
+				echo "[Info] No subdomain submited";			
+				vhost_file="/etc/apache2/sites-available/$DOMAIN"
+				if [ -f $vhost_file ]
+                                then
+                                        echo "[Warning] $vhost_file already exist"
+                                        read -p "Are you sure you want to overwrite it?[Yy/Nn] " -n 1
+					echo ""
+                                        if [[ ! $REPLY =~ ^[Yy]$ ]]
+                                        then    
+						echo "[Info] NOTHING DONE"
+                                        	exit 1
+                                	fi
+					echo "#`date`" > $vhost_file
+                                fi
+				
+				echo "[Info] Creating $vhost_file";
+				DOCUMENT_ROOT="/home/vhost_owners/$OWNER/domains/$DOMAIN/httpdocs"
+				SERVER_NAME=$DOMAIN
+				LOGS_PATH="/home/vhost_owners/$OWNER/domains/$DOMAIN/logs"
+				IFS=$''	
+				while read line; do
+					eval_line=`eval echo \"$line\"`
+                                	echo $eval_line >> $vhost_file  
+                                done < $TEMPLATE
+				if [ $PROTOCOL == "both" ]
+                                then
+                                	if [ $FORCE_HTTPS == 1  ]
+                                        then    
+                                        	while read line; do
+                                                	eval_line=`eval echo \"$line\"`
+                                                        echo $eval_line >> $vhost_file
+                                                done < ../templates/_force_https_template
+                                        else
+
+                                        	SERVER_PORT=443
+                                        	SSL_DIRECTIVES="
+        SSLEngine on                                    
+        SSLCertificateFile /etc/ssl/certs/server.crt
+        SSLCertificateKeyFile /etc/ssl/private/server.key               
+			                               "
+
+                        			while read line; do
+                                                	eval_line=`eval echo \"$line\"`
+                                                        echo $eval_line >> $vhost_file
+                                                done < $TEMPLATE
+                                        fi
+
+                            	fi				
+				
+				a2ensite $SERVER_NAME 
+				apache2ctl configtest
+				if [ $? == 0 ]
+				then
+					apache2ctl -k graceful
+				else
+					echo -e "\E[37;41m[Error] check apache config files"
+					tput sgr0
+				fi
+			fi
+		else
+			echo -e "\E[37;41m[Error] domain $DOMAIN doesn't exist use: ./add_domain ... to add it"
+			tput sgr0
+                        exit $?
+		fi
+	else
+		echo -e "\E[37;41m[Error] virtual host owner $OWNER doesn't exist use: ./add_domain ... to add it"
+		tput sgr0
+                exit $?
+	fi
+else
+        echo "Usage: `basename $0` -o VHOST_OWNER -d DOMAIN.COM [-p http|https] [-s SUBDOMAIN] [-a alias1,alias2...]"
+        echo "[Options]"
+        echo "        -c To create the VHOST_OWNER ans DOMAIN  if not exist"
+
+        exit $E_OPTERROR          # Exit and explain usage.
+                            # Usage: scriptname -options
+
+fi
+exit $?

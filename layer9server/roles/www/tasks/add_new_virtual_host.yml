@@ -1,0 +1,12 @@
+---
+- name: Creates www domain directory
+  file: path={{ www_domain_directory }}/{{ www_domain_name }} state=directory owner={{ www_user }} group={{ www_group }}
+
+- name: Add domain to www config files
+  template: src=domain.conf.j2 dest={{ www_virtual_domain_files_path }}/{{ www_domain_name }}.conf owner={{ www_user }} group={{ www_group }} mode="u=rwx,g=rx,o="
+
+- name: Enable domain
+  command: /usr/sbin/a2ensite {{ www_domain_name }}.conf 
+
+- name: Put default landing page content for the domain
+  git: repo=ssh://git@github.com:jruix/landing_pages.git remote=new_domain dest={{ www_domain_directory }}/{{ www_domain_name }}

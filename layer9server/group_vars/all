@@ -1,0 +1,6 @@
+---
+# Which version of Magento to deploy
+mag_version: 1.9.0.1
+
+# Magento installation destination
+domain_name: html

@@ -1,0 +1,8 @@
+---
+#TODO: Check if selinux can be enabled with ASL and configure ti for being use if possible
+#- name: Check if mysql(mariadb) is present
+#  apt: name=python-selinux state=present
+#
+#- selinux: state=disabled
+#  notify:
+#        - restart server

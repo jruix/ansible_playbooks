@@ -1,0 +1,33 @@
+SERVER_IP=`eval /sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
+
+echo "zone \"$1\" in {
+        type master;
+        file \"$1.zone\";
+};" >> /etc/bind/named.conf.local;
+
+echo "\$TTL 86400
+
+$1. IN SOA ns1.layer9servers.com. ns2.layer9servers.com. (
+        1 ; serial
+        3H ; refresh
+        1H ; retry
+        1W ; expire
+        1D ; ttl
+)
+
+; Name Servers
+@       IN      NS      ns1.layer9servers.com.
+@       IN      NS      ns2.layer9servers.com.
+
+; MX Records
+@       IN      MX      10      mail
+
+; Address Records
+@       IN      A       $SERVER_IP
+www     IN      A       $SERVER_IP
+ftp     IN      A       $SERVER_IP
+mail    IN      A       $SERVER_IP
+" > {{ dns_zone_directory }}/$1.zone
+
+echo -e "Checking dns zones\n"
+named-checkconf

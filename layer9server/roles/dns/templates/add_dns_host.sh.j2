@@ -1,0 +1,6 @@
+#!/bin/bash
+# args subdomain_name domain
+#SERVER_IP=`eval /sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'
+
+echo "$1   IN      A       $SERVER_IP" >> {{ dns_zones_directory }}/$2.zone 
+ 

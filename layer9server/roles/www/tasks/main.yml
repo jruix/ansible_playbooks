@@ -1,0 +1,7 @@
+---
+- name: Check if apache is present
+  apt: name=apache2 state=present
+
+- name: Creating new www virtual host enviroment
+  include: add_new_virtual_host.yml
+  when: www_domain_name is defined

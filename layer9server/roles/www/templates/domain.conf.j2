@@ -1,0 +1,10 @@
+<VirtualHost *:80>
+    ServerName {{ www_domain_name }}
+    DocumentRoot /var/www/{{www_domain_name  }}
+    ServerAdmin webmaster@{{ www_domain_name }}
+    ErrorLog /var/log/{{ www_domain_name }}/error_log
+    CustomLog /var/log/{{ www_domain_name }}/access_log common
+    <Directory /var/www/{{ www_domain_name }}>
+        Options None
+    </Directory>
+</VirtualHost>
