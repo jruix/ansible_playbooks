@@ -1,2 +1,5 @@
 [amazon]
-ec2-54-172-49-173.compute-1.amazonaws.com
+54.86.16.58 ansible_ssh_private_key_file=/home/jruiz/.ssh/id_jruiz_amazon
+
+[vagrant]
+192.168.33.10  ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key ansible_ssh_port=22

@@ -1,0 +1,21 @@
+$TTL 86400
+{{ dns_domain_name }}. IN SOA {{ name_server_1}}. {{ name_server_2}}. (
+        1 ; serial
+        3H ; refresh
+        1H ; retry
+        1W ; expire
+        1D ; ttl
+)
+
+; Name Servers
+@       IN      NS      {{ name_server_1}}.
+@       IN      NS      {{ name_server_1}}.
+
+; MX Records
+@       IN      MX      10      mail
+
+; Address Records
+@       IN      A       {{ remote_server_ip_address }}
+www     IN      A       {{ remote_server_ip_address }}
+ftp     IN      A       {{ remote_server_ip_address }}
+mail    IN      A       {{ remote_server_ip_address }}

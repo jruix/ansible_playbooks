@@ -6,3 +6,5 @@
 #- selinux: state=disabled
 #  notify:
 #        - restart server
+- name: Check if git is present
+  apt: name=git state=present

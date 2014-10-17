@@ -6,16 +6,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box_url = "https://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-amd64-vagrant-disk1.box"
   # config.vm.network :private_network, ip: "192.168.111.222"
   config.vm.provision "ansible" do |ansible|
-    ansible.playbook = "site.yml"
+    ansible.playbook = "add_new_virtual_host.yml"
     ansible.verbose = "vvvv"
     ansible.sudo = "true"
     #ansible.sudo_user = "vagrant"    
   end
 
-  config.vm.network :forwarded_port, guest: 8080, host: 3751
-  config.vm.network :forwarded_port, guest: 80, host: 3750
-  # config.vm.network :private_network, ip: "192.168.33.10"
-  # config.vm.network :public_network
+  #config.vm.network :forwarded_port, guest: 8080, host: 3751
+  config.vm.network :forwarded_port, guest: 80, host: 8080
+  config.vm.network :private_network, ip: "192.168.33.10"
+  config.vm.network :public_network
 
   # config.ssh.forward_agent = true
 
@@ -24,7 +24,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
-  config.vm.provider :virtualbox do |vb|
-    vb.customize ["modifyvm", :id, "--memory", "1024", "--name", "ansible-plaything"]
-  end
+  #config.vm.provider :virtualbox do |vb|
+  #  vb.customize ["modifyvm", :id, "--memory", "1024", "--name", "ansible-plaything"]
+  #end
 end

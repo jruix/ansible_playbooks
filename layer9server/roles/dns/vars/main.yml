@@ -1,4 +1,8 @@
 ---
 dns_zones_directory: /var/dns
+dns_zones_config_file: /etc/bind/named.conf.local
 bind_user: bind
 bind_group: bind
+admin_user: root
+admin_group: root
+admin_user_home_path: /root

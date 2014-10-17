@@ -1,0 +1,12 @@
+---
+- name: Add domain to named.conf.local
+  lineinfile: dest={{ dns_zones_config_file }} line="zone \"{{ dns_domain_name }}\" in {type master;file \"dns_domain_name.zone\";};"
+
+- name: Creates dns zone file
+  template: src=domain.zone.j2 dest={{ www_virtual_domain_files_path }}/{{ www_domain_name }}.conf owner={{ bind_user }} group={{ bind_group }} mode="u=rwx,g=rx,o="
+
+- name: Enable domain
+  command: /usr/sbin/a2ensite {{ www_domain_name }}.conf 
+
+- name: Put default landing page content for the domain
+  git: repo=ssh://git@github.com:jruix/landing_pages.git remote=new_domain dest={{ www_domain_directory }}/{{ www_domain_name }}
